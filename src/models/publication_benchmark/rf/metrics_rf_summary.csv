@@ -1,0 +1,2 @@
+model,rmse_mean,rmse_std,mae_mean,mape_mean,categories_evaluated
+rf,1.3165613822883935,0.7258108964584471,0.9168940608452181,45.66943185577919,5

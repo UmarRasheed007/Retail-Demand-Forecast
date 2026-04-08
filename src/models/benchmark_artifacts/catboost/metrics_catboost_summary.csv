@@ -1,0 +1,2 @@
+model,rmse_mean,rmse_std,mae_mean,mape_mean,categories_evaluated
+catboost,2.466491755004428,1.9173655645457306,1.541343863770543,59.721093194286105,5

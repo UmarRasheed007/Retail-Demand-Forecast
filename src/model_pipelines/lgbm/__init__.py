@@ -1,0 +1,1 @@
+"""LGBM model pipeline entrypoints."""

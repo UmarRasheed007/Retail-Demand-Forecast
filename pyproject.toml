@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freshretail-demand-forecasting"
+version = "0.1.0"
+description = "Modular retail demand forecasting pipelines and benchmarks"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = [
+  "aggregate_impute",
+  "evaluate_inventory_impact",
+  "featurize",
+  "ingest_flatten",
+  "run_final_stage",
+  "train_baseline_benchmarks",
+  "train_darts_nbeats",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["model_pipelines*"]
+
+[project.scripts]
+trainnbeats = "model_pipelines.nbeats.train:main"
+predictnbeats = "model_pipelines.nbeats.predict:main"
+pipelinenbeats = "model_pipelines.nbeats.pipeline:main"
+
+trainlgbm = "model_pipelines.lgbm.train:main"
+predictlgbm = "model_pipelines.lgbm.predict:main"
+pipelinelgbm = "model_pipelines.lgbm.pipeline:main"
+
+trainrf = "model_pipelines.rf.train:main"
+predictrf = "model_pipelines.rf.predict:main"
+pipelinerf = "model_pipelines.rf.pipeline:main"
+
+trainextratrees = "model_pipelines.extra_trees.train:main"
+predictextratrees = "model_pipelines.extra_trees.predict:main"
+pipelineextratrees = "model_pipelines.extra_trees.pipeline:main"
+
+traingbr = "model_pipelines.gbr.train:main"
+predictgbr = "model_pipelines.gbr.predict:main"
+pipelinegbr = "model_pipelines.gbr.pipeline:main"
+
+trainxgb = "model_pipelines.xgb.train:main"
+predictxgb = "model_pipelines.xgb.predict:main"
+pipelinexgb = "model_pipelines.xgb.pipeline:main"
+
+traincatboost = "model_pipelines.catboost.train:main"
+predictcatboost = "model_pipelines.catboost.predict:main"
+pipelinecatboost = "model_pipelines.catboost.pipeline:main"
+
+benchmark = "model_pipelines.benchmark_analysis:main"
+benchmarkpub = "model_pipelines.benchmark_analysis_publication:main"

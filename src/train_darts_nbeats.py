@@ -29,7 +29,9 @@ def save_nbeats_model(model, path):
     Saves only the state_dict of model.model to the given path.
     Creates parent directories if needed.
     """
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    out_dir = os.path.dirname(path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
     # pull out the raw Lightning module inside Darts
     lightning_module = model.model  
 
@@ -49,10 +51,14 @@ def load_nbeats_model(
     Returns the ready-to-use model.
     """
    # Re-create the same wrapper
+    # Keep load-time model construction aligned with train_for_category.
     model = NBEATSModel(
         input_chunk_length=input_chunk_length,
         output_chunk_length=output_chunk_length,
         random_state=random_state,
+        n_epochs=50,
+        dropout=0.1,
+        batch_size=8,
         pl_trainer_kwargs=pl_trainer_kwargs
     )
     # Load *only* weights (and encoders)
@@ -185,7 +191,7 @@ def predict_for_category(
         pred_ts = pred_ts.append(segment)
 
     # 6) to DataFrame
-    df_pred = pred_ts.pd_dataframe().reset_index()
+    df_pred = pred_ts.to_dataframe().reset_index()
     df_pred.columns = ["dt", "prediction"]
     df_pred["third_category_id"] = category
     return df_pred

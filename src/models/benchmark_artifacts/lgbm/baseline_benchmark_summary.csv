@@ -1,0 +1,2 @@
+model,rmse_mean,rmse_std,mae_mean,mape_mean,categories_evaluated
+lgbm,2.2427267634399186,1.600008708396294,1.3941281716806806,54.35019204316652,5

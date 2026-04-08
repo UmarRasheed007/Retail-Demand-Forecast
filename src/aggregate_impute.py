@@ -73,7 +73,12 @@ def aggregate_and_impute(input_dir: str, output_path: str) -> None:
         # write/app​end to Parquet
         table = pa.Table.from_pandas(daily, preserve_index=False)
         if writer is None:
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            out_dir = os.path.dirname(output_path)
+            if not out_dir:
+                print(f"Warning: output path {output_path} has no directory component; writing to current directory.")
+
+            os.makedirs(out_dir, exist_ok=True)
+            
             writer = pq.ParquetWriter(output_path, table.schema)
         writer.write_table(table)
 
