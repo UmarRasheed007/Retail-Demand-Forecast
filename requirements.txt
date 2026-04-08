@@ -8,6 +8,7 @@ appnope==0.1.4
 asttokens==3.0.0
 attrs==25.3.0
 certifi==2025.6.15
+catboost==1.2.8
 charset-normalizer==3.4.2
 cloudpickle==3.1.1
 colorlog==6.9.0
@@ -45,7 +46,7 @@ kiwisolver==1.4.8
 lightgbm==4.6.0
 lightning==2.5.2
 lightning-utilities==0.14.3
-llvmlite==0.44.0
+llvmlite==0.46.0
 Mako==1.3.10
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2

@@ -1,12 +1,12 @@
 # train_pipeline.py
 
-#!/usr/bin/env python
 import os
 import argparse
 from ingest_flatten import stream_and_flatten
 from aggregate_impute import aggregate_and_impute
 from featurize import build_features
 from train_darts_nbeats import main as train_nbeats
+from train_baseline_benchmarks import benchmark_models_for_categories
 
 def main():
     p = argparse.ArgumentParser(
@@ -28,6 +28,12 @@ def main():
         "--modelready-path",
         default="data/daily_dataset/daily_df_modelready.parquet",
         help="where to write/read final feature‐ready parquet"
+    )
+    p.add_argument(
+        "--max-records",
+        type=int,
+        default=None,
+        help="Optional cap on streamed source records for faster runs"
     )
     p.add_argument(
         "--cats",
@@ -53,6 +59,23 @@ def main():
         default=7,
         help="NBEATS output_chunk_length"
     )
+    p.add_argument(
+        "--run-benchmark",
+        action="store_true",
+        help="Run baseline model benchmarking on model-ready data"
+    )
+    p.add_argument(
+        "--benchmark-models",
+        nargs="+",
+        default=["lgbm", "rf", "extra_trees", "gbr", "xgb", "catboost"],
+        help="Baseline model keys to compare"
+    )
+    p.add_argument(
+        "--benchmark-test-days",
+        type=int,
+        default=10,
+        help="Number of final days per category reserved for benchmark testing"
+    )
     args = p.parse_args()
 
     # 1️⃣ Ingest & flatten hourly → parquet chunks
@@ -61,7 +84,8 @@ def main():
     stream_and_flatten(
         split=args.split,
         batch_size=args.batch_size,
-        output_dir=args.flat_dir
+        output_dir=args.flat_dir,
+        max_records=args.max_records
     )
 
     # 2️⃣ Aggregate & impute → daily parquet
@@ -78,8 +102,19 @@ def main():
         output_path=args.modelready_path
     )
 
-    # 4️⃣ Train per‐category N-BEATS
-    print("\n▶️  Step 4: train N-BEATS models")
+    # 4️⃣ Benchmark baseline models (optional)
+    if args.run_benchmark:
+        print("\n▶️  Step 4: benchmark baseline regressors")
+        benchmark_models_for_categories(
+            modelready_path=args.modelready_path,
+            cats=args.cats,
+            model_names=args.benchmark_models,
+            output_dir=args.model_dir,
+            test_days=args.benchmark_test_days,
+        )
+
+    # 5️⃣ Train per‐category N-BEATS
+    print("\n▶️  Step 5: train N-BEATS models")
     train_nbeats(
     cats=args.cats,
     modelready_path=args.modelready_path,

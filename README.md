@@ -221,9 +221,29 @@ python src/train_pipeline.py \
   --modelready-path data/daily_dataset/daily_df_modelready.parquet \
   --cats 81 60 82 184 1 \
   --model-dir models \
+  --run-benchmark \
+  --benchmark-models lgbm rf extra_trees gbr xgb catboost \
+  --benchmark-test-days 10 \
   --input-len 28 \
   --output-len 7
 ```
+
+**Baseline Model Benchmark Only**:
+
+```bash
+python src/train_baseline_benchmarks.py \
+  --modelready-path data/daily_dataset/daily_df_modelready.parquet \
+  --cats 81 60 82 184 1 \
+  --models lgbm rf extra_trees gbr xgb catboost \
+  --test-days 10 \
+  --output-dir models
+```
+
+This writes:
+- `models/baseline_benchmark_detailed.csv`
+- `models/baseline_benchmark_summary.csv`
+
+The summary file ranks models by mean RMSE across selected categories.
 
 **Prediction**:
 
@@ -239,31 +259,29 @@ python src/prediction_pipeline.py \
   --output-len 7
 ```
 
-Just paste that snippet into your README.md immediately after the Dependencies section. Let me know if you’d like any tweaks!
-
----
-
-
 ## 🚀 Docker Commands
 
 **Container Setup**:
 ```
-docker-compose build
+docker compose build
 ```
 
 **Training**:
 
 ```bash
-docker-compose run --rm trainer
+docker compose run --rm trainer
 ```
 
 **Prediction**:
 
 ```bash
-docker-compose run --rm predictor
+docker compose run --rm predictor
 ```
 
-Just paste that snippet into your README.md immediately after the Dependencies section. Let me know if you’d like any tweaks!
+**Notes**:
+- Keep Docker Desktop running before executing commands.
+- First run can take time because Python packages and model dependencies are large.
+- Training/prediction outputs are persisted to your local workspace because `./` is bind-mounted to `/app`.
 ---
 
 

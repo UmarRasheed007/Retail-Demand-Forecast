@@ -1,12 +1,11 @@
 # docker-compose.yml
-version: "3.8"
 
 services:
   trainer:
     # build from the local Dockerfile
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
 
     image: ghcr.io/jhilmitasri/freshretail-demand-forecasting:trainer-latest
     # mount your entire project into /app
@@ -15,12 +14,12 @@ services:
     working_dir: /app
     # default command to kick off training
     command: >
-      python src/train_pipeline.py --split train --batch-size 100000 --flat-dir src/data/flattened_chunks --daily-path src/data/daily_dataset/daily_df_imputed.parquet --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --cats 81 60 82 184 1 --model-dir src/models --input-len 28 --output-len 7
+      python src/train_pipeline.py --split train --batch-size 100000 --flat-dir src/data/flattened_chunks --daily-path src/data/daily_dataset/daily_df_imputed.parquet --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --cats 81 60 82 184 1 --model-dir src/models --run-benchmark --benchmark-models lgbm rf extra_trees gbr xgb catboost --benchmark-test-days 10 --input-len 28 --output-len 7
 
   predictor:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     image: ghcr.io/jhilmitasri/freshretail-demand-forecasting:predictor-latest
     volumes:
       - ./:/app

@@ -5,21 +5,26 @@ import pandas as pd
 from datasets import load_dataset
 from tqdm import tqdm
 
-def stream_and_flatten(split: str, batch_size: int, output_dir: str) -> None:
+def stream_and_flatten(split: str, batch_size: int, output_dir: str, max_records: int | None = None) -> None:
     """
     Streams the FreshRetailNet-50K dataset, flattens each record into one row per hour,
     and writes out Parquet chunks of size `batch_size`.
+    If `max_records` is provided, only that many source records are streamed.
     """
     
     os.makedirs(output_dir, exist_ok=True)
     ds = load_dataset("Dingdong-Inc/FreshRetailNet-50K", split=split, streaming=True)
     buffer = []
     count = 0
+    seen = 0
     # initialize progress bar for records and chunk count
     pbar = tqdm(ds, desc=f"Streaming & flattening ({split})", unit="records")
     chunk_idx = 0
 
     for rec in pbar:
+        seen += 1
+        if max_records is not None and seen > max_records:
+            break
         # pull out scalar fields
         meta = {
             "city_id": rec["city_id"],
@@ -81,8 +86,12 @@ def main():
         "--output-dir", default="data/flattened_chunks",
         help="Directory to write chunk_{:04d}.parquet files."
     )
+    parser.add_argument(
+        "--max-records", type=int, default=None,
+        help="Optional cap on number of source records to stream for faster runs."
+    )
     args = parser.parse_args()
-    stream_and_flatten(args.split, args.batch_size, args.output_dir)
+    stream_and_flatten(args.split, args.batch_size, args.output_dir, max_records=args.max_records)
 
 if __name__ == "__main__":
     main()

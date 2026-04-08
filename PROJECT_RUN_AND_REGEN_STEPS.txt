@@ -1,0 +1,155 @@
+ FRESHRETAIL DEMAND FORECASTING - FULL REGENERATION RUNBOOK
+===========================================================
+
+Run all commands from project root:
+D:\freshretail-demand-forecasting
+
+-----------------------------------------------------------
+0) OPTIONAL: CLEAN PREVIOUS GENERATED OUTPUTS
+-----------------------------------------------------------
+PowerShell:
+
+Remove-Item -Recurse -Force .\src\data\flattened_chunks\* -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\src\data\daily_dataset\daily_df_imputed.parquet -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\src\data\daily_dataset\daily_df_modelready.parquet -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\src\models\baseline_benchmark_*.csv -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\src\models\inventory_impact_*.csv -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\src\models\category_forecasts.png -ErrorAction SilentlyContinue
+
+-----------------------------------------------------------
+1) BUILD CONTAINERS
+-----------------------------------------------------------
+
+docker compose build
+
+-----------------------------------------------------------
+2) REGENERATE TRAINING DATA + N-BEATS MODELS + (OPTIONAL) BENCHMARK IN PIPELINE
+-----------------------------------------------------------
+
+A) FULL DATA RUN (best for final quality, longer runtime):
+
+docker compose run --rm --remove-orphans trainer python src/train_pipeline.py --split train --batch-size 12000 --flat-dir src/data/flattened_chunks --daily-path src/data/daily_dataset/daily_df_imputed.parquet --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --cats 81 60 82 184 1 --model-dir src/models --run-benchmark --benchmark-models lgbm rf extra_trees gbr xgb catboost --benchmark-test-days 10 --input-len 28 --output-len 7
+
+B) QUICK/STABLE RUN (if memory/time is limited):
+
+docker compose run --rm --remove-orphans trainer python src/train_pipeline.py --split train --batch-size 12000 --max-records 50000 --flat-dir src/data/flattened_chunks --daily-path src/data/daily_dataset/daily_df_imputed.parquet --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --cats 81 60 82 184 1 --model-dir src/models --run-benchmark --benchmark-models lgbm rf extra_trees gbr xgb catboost --benchmark-test-days 10 --input-len 28 --output-len 7
+
+-----------------------------------------------------------
+3) REGENERATE BENCHMARK + INVENTORY ANALYSIS (FINAL-STAGE ARTIFACTS)
+-----------------------------------------------------------
+
+Single command (recommended):
+
+docker compose run --rm --remove-orphans trainer sh -lc "python src/run_final_stage.py"
+
+If you want full-scale benchmark (no row cap), run:
+
+docker compose run --rm --remove-orphans trainer sh -lc "python src/run_final_stage.py --max-rows-per-category 99999999"
+
+This regenerates:
+- src/models/baseline_benchmark_detailed.csv
+- src/models/baseline_benchmark_summary.csv
+- src/models/baseline_benchmark_predictions.csv
+- src/models/inventory_impact_detailed.csv
+- src/models/inventory_impact_summary.csv
+
+-----------------------------------------------------------
+4) REGENERATE PREDICTION FIGURE(S)
+-----------------------------------------------------------
+
+Run prediction pipeline:
+
+docker compose run --rm --remove-orphans predictor
+
+This generates:
+- src/models/category_forecasts.png
+
+If you want that image under docs for README-style display:
+
+Copy-Item .\src\models\category_forecasts.png .\docs\PredictionPlot_Eval.png -Force
+
+-----------------------------------------------------------
+5) REGENERATE DISSERTATION DOCUMENTS
+-----------------------------------------------------------
+
+A) Regenerate final results markdown report from latest CSVs:
+
+docker compose run --rm --remove-orphans trainer sh -lc "python src/generate_dissertation_report.py"
+
+Output:
+- docs/dissertation_results_final.md
+
+B) Regenerate presentation markdown (already maintained as template):
+- docs/dissertation_presentation.md
+(Keep this file as source slide script; edit manually if needed.)
+
+C) Regenerate PPTX presentation from latest CSVs:
+
+docker compose run --rm --remove-orphans trainer sh -lc "pip install --no-cache-dir python-pptx && python src/generate_presentation_pptx.py"
+
+Output:
+- docs/dissertation_presentation.pptx
+
+-----------------------------------------------------------
+6) REGENERATE EDA IMAGES IN docs/ (hourly_sales.png, stockout_rate.png, weekday_sales.png)
+-----------------------------------------------------------
+
+These are notebook-generated visuals. Recreate by opening and rerunning the EDA notebook(s), then saving figures to docs/:
+- notebooks/01_eda.ipynb
+- notebooks/01_eda_eval.ipynb
+
+After running, ensure files exist in docs/:
+- docs/hourly_sales.png
+- docs/stockout_rate.png
+- docs/weekday_sales.png
+
+(There is no dedicated script currently in src/ that exports these three images directly.)
+
+-----------------------------------------------------------
+7) FINAL CHECKLIST (FILES TO VERIFY)
+-----------------------------------------------------------
+
+Core data/model artifacts:
+- src/data/daily_dataset/daily_df_imputed.parquet
+- src/data/daily_dataset/daily_df_modelready.parquet
+- src/models/nbeats_cat_1.pt
+- src/models/nbeats_cat_60.pt
+- src/models/nbeats_cat_81.pt
+- src/models/nbeats_cat_82.pt
+- src/models/nbeats_cat_184.pt
+
+Benchmark/inventory artifacts:
+- src/models/baseline_benchmark_summary.csv
+- src/models/inventory_impact_summary.csv
+
+Presentation/report artifacts:
+- docs/dissertation_results_final.md
+- docs/dissertation_presentation.md
+- docs/dissertation_presentation.pptx
+
+Figures:
+- src/models/category_forecasts.png
+- docs/PredictionPlot_Eval.png
+- docs/hourly_sales.png
+- docs/stockout_rate.png
+- docs/weekday_sales.png
+
+-----------------------------------------------------------
+8) MINIMUM COMMANDS FOR ONE-SHOT FINAL DELIVERABLE REGEN
+-----------------------------------------------------------
+
+docker compose build
+
+docker compose run --rm --remove-orphans trainer python src/train_pipeline.py --split train --batch-size 12000 --max-records 50000 --flat-dir src/data/flattened_chunks --daily-path src/data/daily_dataset/daily_df_imputed.parquet --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --cats 81 60 82 184 1 --model-dir src/models --input-len 28 --output-len 7
+
+docker compose run --rm --remove-orphans trainer sh -lc "python src/run_final_stage.py"
+
+docker compose run --rm --remove-orphans predictor
+
+Copy-Item .\src\models\category_forecasts.png .\docs\PredictionPlot_Eval.png -Force
+
+docker compose run --rm --remove-orphans trainer sh -lc "python src/generate_dissertation_report.py"
+
+docker compose run --rm --remove-orphans trainer sh -lc "pip install --no-cache-dir python-pptx && python src/generate_presentation_pptx.py"
+
+Then rerun EDA notebooks to regenerate docs/hourly_sales.png, docs/stockout_rate.png, docs/weekday_sales.png.
