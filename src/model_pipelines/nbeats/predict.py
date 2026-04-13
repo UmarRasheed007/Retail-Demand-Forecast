@@ -12,13 +12,6 @@ if str(SRC_DIR) not in sys.path:
 from model_pipelines.nbeats.core import predict_nbeats, generate_nbeats_figure
 from model_pipelines.utils.data import prepare_modelready_if_missing, resolve_data_path
 
-
-    args.modelready_path = resolve_data_path(args.modelready_path, anchor_file=__file__)
-    args.train_modelready_path = resolve_data_path(args.train_modelready_path, anchor_file=__file__)
-    args.daily_path = resolve_data_path(args.daily_path, anchor_file=__file__)
-    args.flat_dir = resolve_data_path(args.flat_dir, anchor_file=__file__)
-    args.model_dir = resolve_data_path(args.model_dir, anchor_file=__file__)
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Predict with N-BEATS and generate model-specific PNG")
     parser.add_argument("--batch-size", type=int, default=12000)
@@ -32,6 +25,12 @@ def main() -> None:
     parser.add_argument("--output-len", type=int, default=7)
     parser.add_argument("--output-dir", default="src/models/benchmark_artifacts/nbeats")
     args = parser.parse_args()
+
+    args.modelready_path = resolve_data_path(args.modelready_path, anchor_file=__file__)
+    args.train_modelready_path = resolve_data_path(args.train_modelready_path, anchor_file=__file__)
+    args.daily_path = resolve_data_path(args.daily_path, anchor_file=__file__)
+    args.flat_dir = resolve_data_path(args.flat_dir, anchor_file=__file__)
+    args.model_dir = resolve_data_path(args.model_dir, anchor_file=__file__)
 
     prepare_modelready_if_missing(
         modelready_path=args.modelready_path,

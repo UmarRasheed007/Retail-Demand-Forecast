@@ -67,7 +67,7 @@ After this, you can run commands directly:
 ```powershell
 # N-BEATS
 trainnbeats --cats 81 60 82 184 1 --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --model-dir src/models --input-len 28 --output-len 7
-predictnbeats --cats 81 60 82 184 1 --train-modelready-path src/data/daily_dataset/daily_df_modelready.parquet --model-dir src/models --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --input-len 28 --output-len 7
+predictnbeats --cats 81 60 82 184 1 --train-modelready-path src/data/daily_dataset/daily_df_modelready.parquet --model-dir src/models --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --input-len 28 --output-len 7 --output-dir src/models/benchmark_artifacts/nbeats
 pipelinenbeats --cats 81 60 82 184 1 --train-modelready-path src/data/daily_dataset/daily_df_modelready.parquet --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --model-dir src/models --input-len 28 --output-len 7 --output-dir src/models/benchmark_artifacts/nbeats
 
 # LGBM

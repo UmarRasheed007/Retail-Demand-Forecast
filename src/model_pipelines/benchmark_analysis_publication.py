@@ -79,12 +79,14 @@ def _build_mean_ensemble(pred_df: pd.DataFrame) -> pd.DataFrame:
     d = pred_df.copy()
     d["dt"] = pd.to_datetime(d["dt"])
 
+    # Take actual from first occurrence, average predictions across models for each category/date.
     ens = (
-        d.groupby(["category", "dt"], as_index=False)
+        d.groupby(["category", "dt"], dropna=False, as_index=False)
         .agg(
-            actual=("actual", "mean"),
+            actual=("actual", "first"),
             prediction=("prediction", "mean"),
         )
+        .reset_index(drop=True)
     )
     ens["model"] = "ensemble_mean"
     ens["error"] = ens["actual"] - ens["prediction"]
