@@ -198,3 +198,21 @@ cython_debug/
 .DS_Store
 
 notebooks/data/fresh_retail_net_daily.csv
+
+# -----------------------------------------------------------------------------
+# Project-specific generated artifacts (FreshRetail demand forecasting)
+# -----------------------------------------------------------------------------
+
+# Training outputs, checkpoints, and benchmark artifacts
+src/models/
+
+# CatBoost training logs/artifacts
+catboost_info/
+
+# Local notebooks and exports generated during experimentation
+*.ipynb_checkpoints/
+notebooks/**/.ipynb_checkpoints/
+
+# Common local runtime clutter
+*.tmp
+*.bak
