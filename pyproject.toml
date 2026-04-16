@@ -17,7 +17,6 @@ py-modules = [
   "ingest_flatten",
   "run_final_stage",
   "train_baseline_benchmarks",
-  "train_darts_nbeats",
 ]
 
 [tool.setuptools.packages.find]
@@ -25,10 +24,6 @@ where = ["src"]
 include = ["model_pipelines*"]
 
 [project.scripts]
-trainnbeats = "model_pipelines.nbeats.train:main"
-predictnbeats = "model_pipelines.nbeats.predict:main"
-pipelinenbeats = "model_pipelines.nbeats.pipeline:main"
-
 trainlgbm = "model_pipelines.lgbm.train:main"
 predictlgbm = "model_pipelines.lgbm.predict:main"
 pipelinelgbm = "model_pipelines.lgbm.pipeline:main"
@@ -54,4 +49,3 @@ predictcatboost = "model_pipelines.catboost.predict:main"
 pipelinecatboost = "model_pipelines.catboost.pipeline:main"
 
 benchmark = "model_pipelines.benchmark_analysis:main"
-benchmarkpub = "model_pipelines.benchmark_analysis_publication:main"
