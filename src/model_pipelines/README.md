@@ -4,11 +4,6 @@ This folder is the modular entrypoint for model training, prediction, benchmarki
 
 ## Structure
 
-- nbeats/
-  - core.py
-  - train.py
-  - predict.py
-  - pipeline.py
 - baselines/
   - core.py
 - lgbm/, rf/, extra_trees/, gbr/, xgb/, catboost/
@@ -27,7 +22,6 @@ This folder is the modular entrypoint for model training, prediction, benchmarki
 
 Per-model forecast figure names are explicit:
 
-- forecast_nbeats_category_grid.png
 - forecast_lgbm_category_grid.png
 - forecast_rf_category_grid.png
 - forecast_extra_trees_category_grid.png
@@ -65,11 +59,6 @@ pip install -e .
 After this, you can run commands directly:
 
 ```powershell
-# N-BEATS
-trainnbeats --cats 81 60 82 184 1 --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --model-dir src/models --input-len 28 --output-len 7
-predictnbeats --cats 81 60 82 184 1 --train-modelready-path src/data/daily_dataset/daily_df_modelready.parquet --model-dir src/models --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --input-len 28 --output-len 7 --output-dir src/models/benchmark_artifacts/nbeats
-pipelinenbeats --cats 81 60 82 184 1 --train-modelready-path src/data/daily_dataset/daily_df_modelready.parquet --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --model-dir src/models --input-len 28 --output-len 7 --output-dir src/models/benchmark_artifacts/nbeats
-
 # LGBM
 trainlgbm --cats 81 60 82 184 1 --modelready-path src/data/daily_dataset/daily_df_modelready.parquet --test-days 10 --output-dir src/models/benchmark_artifacts/lgbm
 predictlgbm --cats 81 60 82 184 1 --modelready-path src/data/daily_dataset/daily_df_eval_modelready.parquet --daily-path src/data/daily_dataset/daily_df_eval.parquet --flat-dir src/data/flattened_chunks_eval --test-days 10 --output-dir src/models/benchmark_artifacts/lgbm
@@ -102,5 +91,4 @@ pipelinecatboost --cats 81 60 82 184 1 --split train --batch-size 12000 --flat-d
 
 # Benchmarks
 benchmark --cats 81 60 82 184 1 --test-days 7
-benchmarkpub --cats 81 60 82 184 1 --test-days 7
 ```

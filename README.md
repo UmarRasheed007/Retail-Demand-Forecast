@@ -124,12 +124,12 @@ This project draws inspiration from how retail giants like Walmart, Target, and 
 
 * [x] **Latent Demand Recovery**: Estimate true demand during stockouts
 * [x] **Daily Aggregation**: Switched from hourly to daily granularity to reduce data sparsity, improve model training stability, and accommodate memory constraints during preprocessing.
-* [x] **Train forecasting models** (LightGBM, LSTM, TFT)
+* [x] **Train forecasting models** (LightGBM, XGBoost, CatBoost, Random Forest, Extra Trees, GBR)
 * [x] **Baseline feature engineering & data processing** for selected third_category_ids (covering ~90 % of demand)  
 * [x] **Begin model training**: LightGBM per category on daily‐aggregated & imputed data  
 * [x] **Evaluate baseline performance** (RMSE/MAE) & feature importances  
 * [x] **Explore recursive vs. direct forecasting strategies**
-* [x] **Prototype sequence models (TFT, N-BEATS, etc.)**
+* [x] **Prototype and compare tabular forecasting models**
 * [ ] Containerize pipeline & deploy inference API
 * [ ] Set up monitoring for data-drift and model health  
 
@@ -153,9 +153,7 @@ This project draws inspiration from how retail giants like Walmart, Target, and 
 │   ├── 08_model_recursive.ipynb
 │   ├── 09_direct_sliding_window.ipynb
 │   ├── 10_sequence_modeling.ipynb
-│   ├── 11_Sequence_Modelling_GPU.ipynb
-│   ├── 12-darts-n-beats.ipynb
-│   └── 14-darts-n-beats.ipynb
+│   └── 11_Sequence_Modelling_GPU.ipynb
 ├── data/
 │   ├── daily_dataset
 │   ├── freshretail_flattened_chunks/   # Full hourly data split into parquet chunks
@@ -164,16 +162,16 @@ This project draws inspiration from how retail giants like Walmart, Target, and 
 │   ├── ingest_flatten.py
 │   ├── aggregate_impute.py
 │   ├── featurize.py
-│   ├── train_darts_nbeats.py
 │   ├── train_pipeline.py
 │   ├── prediction_pipeline.py
 │   └── backup_prediction_pipeline.py
 ├── models/
-│   ├── nbeats_cat_1.pt
-│   ├── nbeats_cat_60.pt
-│   ├── nbeats_cat_81.pt
-│   ├── nbeats_cat_82.pt
-│   └── nbeats_cat_184.pt
+│   ├── lgbm/
+│   ├── rf/
+│   ├── extra_trees/
+│   ├── gbr/
+│   ├── xgb/
+│   └── catboost/
 ├── docs/
 │   ├── hourly_sales.png
 │   ├── stockout_rate.png
@@ -192,7 +190,7 @@ Here is what each script in the `src/` folder does:
 - **ingest_flatten.py**: Streams FreshRetailNet hourly data, flattens it into parquet chunks.
 - **aggregate_impute.py**: Aggregates the flattened hourly chunks to daily frequency and imputes missing sales and out-of-stock flags.
 - **featurize.py**: Builds model-ready feature tables (lags, rolling stats, calendar encodings) for each category.
-- **train_darts_nbeats.py**: Contains the logic to train a separate N‑BEATS model per category and save cleaned checkpoints.
+- **train_pipeline.py**: Runs the end-to-end workflow from ingestion to benchmark-ready model outputs.
 - **train_pipeline.py**: Orchestrates the full training pipeline: ingest → aggregate/impute → featurize → train.
 - **prediction_pipeline.py**: Prepares eval features if needed, loads trained N‑BEATS models, forecasts from the last 28 days, and plots actual vs. predicted values.
 
