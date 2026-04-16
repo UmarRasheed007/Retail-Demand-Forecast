@@ -19,7 +19,6 @@ from model_pipelines.baselines.core import (
     build_pred_with_errors,
     generate_baseline_figures,
 )
-from model_pipelines.nbeats.core import predict_nbeats, generate_nbeats_figure
 from model_pipelines.utils.data import resolve_data_path
 from model_pipelines.utils.metrics import rmse, mae, safe_mape
 from model_pipelines.utils.plotting import (
@@ -170,10 +169,9 @@ Best forecasting model by RMSE: {best['model']} (RMSE={best['rmse_mean']:.4f}, M
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Full benchmark across N-BEATS and classical ML models."
+        description="Full benchmark across classical ML models."
     )
     parser.add_argument("--train-modelready-path", default="data/daily_dataset/daily_df_modelready.parquet")
-    parser.add_argument("--eval-modelready-path", default="data/daily_dataset/daily_df_eval_modelready.parquet")
     parser.add_argument("--cats", nargs="+", type=int, default=[81, 60, 82, 184, 1])
     parser.add_argument(
         "--baseline-models",
@@ -182,15 +180,10 @@ def main() -> None:
     )
     parser.add_argument("--test-days", type=int, default=7)
     parser.add_argument("--max-rows-per-category", type=int, default=None)
-    parser.add_argument("--nbeats-model-dir", default="src/models")
-    parser.add_argument("--nbeats-input-len", type=int, default=28)
-    parser.add_argument("--nbeats-output-len", type=int, default=7)
     parser.add_argument("--output-dir", default="src/models/publication_benchmark")
     args = parser.parse_args()
 
     args.train_modelready_path = resolve_data_path(args.train_modelready_path, anchor_file=__file__)
-    args.eval_modelready_path = resolve_data_path(args.eval_modelready_path, anchor_file=__file__)
-    args.nbeats_model_dir = resolve_data_path(args.nbeats_model_dir, anchor_file=__file__)
 
     os.makedirs(args.output_dir, exist_ok=True)
     figures_dir = os.path.join(args.output_dir, "figures")
@@ -215,23 +208,6 @@ def main() -> None:
         pred_clean.to_csv(os.path.join(model_out, f"predictions_{model_key}.csv"), index=False)
         generate_baseline_figures(model_key, pred_clean, summary_df, model_out)
         all_pred_parts.append(pred_clean)
-
-    # N-BEATS predictions + figure.
-    nbeats_pred = predict_nbeats(
-        train_modelready_path=args.train_modelready_path,
-        eval_modelready_path=args.eval_modelready_path,
-        categories=args.cats,
-        model_dir=args.nbeats_model_dir,
-        input_len=args.nbeats_input_len,
-        output_len=args.nbeats_output_len,
-    )
-
-    if not nbeats_pred.empty:
-        nbeats_out_dir = os.path.join(args.output_dir, "nbeats")
-        os.makedirs(nbeats_out_dir, exist_ok=True)
-        nbeats_pred.to_csv(os.path.join(nbeats_out_dir, "predictions_nbeats.csv"), index=False)
-        generate_nbeats_figure(nbeats_pred, os.path.join(nbeats_out_dir, "forecast_nbeats_category_grid.png"))
-        all_pred_parts.append(nbeats_pred)
 
     if not all_pred_parts:
         raise RuntimeError("No predictions generated. Check input paths and model files.")

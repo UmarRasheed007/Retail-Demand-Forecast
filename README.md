@@ -191,12 +191,7 @@ Here is what each script in the `src/` folder does:
 - **aggregate_impute.py**: Aggregates the flattened hourly chunks to daily frequency and imputes missing sales and out-of-stock flags.
 - **featurize.py**: Builds model-ready feature tables (lags, rolling stats, calendar encodings) for each category.
 - **train_pipeline.py**: Runs the end-to-end workflow from ingestion to benchmark-ready model outputs.
-- **train_pipeline.py**: Orchestrates the full training pipeline: ingest → aggregate/impute → featurize → train.
-- **prediction_pipeline.py**: Prepares eval features if needed, loads trained N‑BEATS models, forecasts from the last 28 days, and plots actual vs. predicted values.
-
-<p float="centre">
-  <img src="docs/PredictionPlot_Eval.png" width="800"/>
-</p>
+- **prediction_pipeline.py**: Prepares evaluation features when needed, loads the trained forecasting model, forecasts the next horizon, and plots actual vs. predicted values.
 
 
 ---
