@@ -1,0 +1,2 @@
+model,rmse_mean,rmse_std,mae_mean,mape_mean,categories_evaluated
+xgb,2.091086540341603,1.3863495437297404,1.3068627805226558,54.06581515249735,5

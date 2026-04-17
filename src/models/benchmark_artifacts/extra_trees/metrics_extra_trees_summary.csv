@@ -1,0 +1,2 @@
+model,rmse_mean,rmse_std,mae_mean,mape_mean,categories_evaluated
+extra_trees,2.354327037713889,1.6450358769352333,1.430279384799786,55.53207022373881,5
