@@ -41,44 +41,51 @@ Running the project writes artifacts under `src/models/`, including benchmark pr
 
 `src/data` is not committed to GitHub. Generate it from the repository root with the steps below.
 
-1. Install dependencies.
+1. Create and activate a virtual environment.
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+2. Install dependencies.
 
 ```powershell
 pip install -r requirements.txt
 pip install -e .
 ```
 
-2. Create flattened hourly parquet chunks for train split.
+3. Create flattened hourly parquet chunks for train split.
 
 ```powershell
 python src/ingest_flatten.py --split train --output-dir src/data/flattened_chunks
 ```
 
-3. Aggregate and impute daily train dataset.
+4. Aggregate and impute daily train dataset.
 
 ```powershell
 python src/aggregate_impute.py --input-dir src/data/flattened_chunks --output-path src/data/daily_dataset/daily_df_imputed.parquet
 ```
 
-4. Build train model-ready features.
+5. Build train model-ready features.
 
 ```powershell
 python src/featurize.py --input-path src/data/daily_dataset/daily_df_imputed.parquet --output-path src/data/daily_dataset/daily_df_modelready.parquet
 ```
 
-5. Create flattened hourly parquet chunks for eval split.
+6. Create flattened hourly parquet chunks for eval split.
 
 ```powershell
 python src/ingest_flatten.py --split eval --output-dir src/data/flattened_chunks_eval
 ```
 
-6. Aggregate and impute daily eval dataset.
+7. Aggregate and impute daily eval dataset.
 
 ```powershell
 python src/aggregate_impute.py --input-dir src/data/flattened_chunks_eval --output-path src/data/daily_dataset/daily_df_eval.parquet
 ```
 
-7. Build eval model-ready features.
+8. Build eval model-ready features.
 
 ```powershell
 python src/featurize.py --input-path src/data/daily_dataset/daily_df_eval.parquet --output-path src/data/daily_dataset/daily_df_eval_modelready.parquet
