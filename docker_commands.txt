@@ -1,6 +1,0 @@
-docker compose build
-
-docker compose run --rm trainer
-
-
-docker compose run --rm predictor
