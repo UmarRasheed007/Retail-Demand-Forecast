@@ -37,6 +37,62 @@ This project focuses on demand forecasting for perishable retail products using 
 
 Running the project writes artifacts under `src/models/`, including benchmark predictions, per-category metrics, and publication-style reports.
 
+## Generate src/data
+
+`src/data` is not committed to GitHub. Generate it from the repository root with the steps below.
+
+1. Install dependencies.
+
+```powershell
+pip install -r requirements.txt
+pip install -e .
+```
+
+2. Create flattened hourly parquet chunks for train split.
+
+```powershell
+python src/ingest_flatten.py --split train --output-dir src/data/flattened_chunks
+```
+
+3. Aggregate and impute daily train dataset.
+
+```powershell
+python src/aggregate_impute.py --input-dir src/data/flattened_chunks --output-path src/data/daily_dataset/daily_df_imputed.parquet
+```
+
+4. Build train model-ready features.
+
+```powershell
+python src/featurize.py --input-path src/data/daily_dataset/daily_df_imputed.parquet --output-path src/data/daily_dataset/daily_df_modelready.parquet
+```
+
+5. Create flattened hourly parquet chunks for eval split.
+
+```powershell
+python src/ingest_flatten.py --split eval --output-dir src/data/flattened_chunks_eval
+```
+
+6. Aggregate and impute daily eval dataset.
+
+```powershell
+python src/aggregate_impute.py --input-dir src/data/flattened_chunks_eval --output-path src/data/daily_dataset/daily_df_eval.parquet
+```
+
+7. Build eval model-ready features.
+
+```powershell
+python src/featurize.py --input-path src/data/daily_dataset/daily_df_eval.parquet --output-path src/data/daily_dataset/daily_df_eval_modelready.parquet
+```
+
+After these steps, you should have:
+
+- `src/data/flattened_chunks/`
+- `src/data/flattened_chunks_eval/`
+- `src/data/daily_dataset/daily_df_imputed.parquet`
+- `src/data/daily_dataset/daily_df_modelready.parquet`
+- `src/data/daily_dataset/daily_df_eval.parquet`
+- `src/data/daily_dataset/daily_df_eval_modelready.parquet`
+
 ## Commands and Usage
 
 For all command-line usage, model-specific training/prediction commands, and benchmark orchestration, see:
